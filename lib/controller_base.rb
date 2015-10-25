@@ -10,9 +10,10 @@ module RailsLite
     attr_reader :req, :res
 
     # Setup the controller
-    def initialize(req, res)
+    def initialize(req, res, route_params = {})
       @req = req
       @res = res
+      @params = Params.new(req, route_params)
       @already_built_response = false
     end
 
@@ -55,7 +56,7 @@ module RailsLite
   def render(template_name)
     path = File.dirname(__FILE__)
     filename = File.join(path, "..", "..", "views",
-      self.class.underscore, "#{template_name}.html.erb"
+      self.class.name.underscore, "#{template_name}.html.erb"
     )
 
     template_code = File.read(filename)
@@ -63,7 +64,7 @@ module RailsLite
     render_content(ERB.new(template_code).result(binding), "text/html")
   end
 
-  def session(req)
+  def session
     @session ||= Session.new(@req)
   end
 
